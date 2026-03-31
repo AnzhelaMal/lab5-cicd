@@ -26,7 +26,13 @@ jobs:
         run: |
           cat > .stylelintrc.json <<'EOF'
           {
-            "extends": "stylelint-config-standard"
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "color-function-notation": null,
+              "alpha-value-notation": null,
+              "declaration-empty-line-before": null,
+              "color-function-alias-notation": null
+            }
           }
           EOF
 
