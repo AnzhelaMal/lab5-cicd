@@ -1,0 +1,49 @@
+name: CI/CD Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-lint-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install linters
+        run: |
+          npm install -g htmlhint stylelint stylelint-config-standard
+
+      - name: Create Stylelint config
+        run: |
+          cat > .stylelintrc.json <<'EOF'
+          {
+            "extends": "stylelint-config-standard"
+          }
+          EOF
+
+      - name: Run HTML linter
+        run: htmlhint index.html
+
+      - name: Run CSS linter
+        run: stylelint style.css
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t engiangi/lab5-cicd:latest .
+
+      - name: Push Docker image
+        run: docker push engiangi/lab5-cicd:latest
